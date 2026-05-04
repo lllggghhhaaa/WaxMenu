@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net11.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-WaxMenu.Sample-95a5827d-c931-4414-8c91-45f3dc7acdd7</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02586" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0-preview.2.26159.112"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WaxMenu\WaxMenu.csproj" />
+    </ItemGroup>
+</Project>
