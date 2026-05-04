@@ -34,24 +34,24 @@ You need to add a menu attribute to the class that you want to make the menu. Yo
 #### Command
 ````csharp
 [Command("menu"), Menu("guild")]
-public class MenuCommands
+public class MenuCommands(MenuIdGenerator generator)
 {
     [Command("open"), RequireGuild]
     public async ValueTask Menu(CommandContext context)
     {
-        await context.RespondAsync(GuildMenuBuilder.MainMenu(context.Guild));
+        await context.RespondAsync(GuildMenuBuilder.MainMenu(context.Guild, generator));
     }
 
     [MenuAction("home")]
     public async ValueTask Menu(MenuContext context)
     {
-        await context.EditResponse(GuildMenuBuilder.MainMenu(context.Guild));
+        await context.EditResponse(GuildMenuBuilder.MainMenu(context.Guild, generator));
     }
 
     [MenuAction("members")]
     public async ValueTask Members(MenuContext context)
     {
-        await context.EditResponse(GuildMenuBuilder.MembersMenu());
+        await context.EditResponse(GuildMenuBuilder.MembersMenu(generator));
     }
 }
 ````
@@ -60,10 +60,7 @@ public class MenuCommands
 ````csharp
 public static class GuildMenuBuilder
 {
-    private const string Prefix = "menu";
-    private const string MenuName = "guild";
-    
-    public static DiscordMessageBuilder MainMenu(DiscordGuild guild)
+    public static DiscordMessageBuilder MainMenu(DiscordGuild guild, MenuIdGenerator generator)
     {
         var embed = new DiscordEmbedBuilder()
             .WithTitle($"Menu - {guild.Name}")
@@ -77,13 +74,13 @@ public static class GuildMenuBuilder
             .AddActionRowComponent(
                 new DiscordButtonComponent(
                     DiscordButtonStyle.Secondary,
-                    $"{Prefix}_{MenuName}_members",
+                    generator.GenerateId("guild", "members"),
                     "Members"));
 
         return messageBuilder;
     }
 
-    public static DiscordMessageBuilder MembersMenu()
+    public static DiscordMessageBuilder MembersMenu(MenuIdGenerator generator)
     {
         var embed = new DiscordEmbedBuilder()
             .WithTitle("Members")
@@ -95,7 +92,7 @@ public static class GuildMenuBuilder
             .AddActionRowComponent(
                 new DiscordButtonComponent(
                     DiscordButtonStyle.Secondary,
-                    $"{Prefix}_{MenuName}_home",
+                    generator.GenerateId("guild", "home"),
                     "Back to Home"));
 
         return messageBuilder;

@@ -15,10 +15,13 @@ public static class SetupExtensionMethods
         Action<MenuExtension> menuCallback, MenuExtensionConfiguration configuration)
     {
         services.ConfigureEventHandlers(builder => builder.AddEventHandlers<ComponentInteractionCreated>());
+        services.AddSingleton(configuration);
+        services.AddSingleton<MenuIdGenerator>();
         services.AddSingleton<MenuExtension>(provider =>
         {
             DiscordClient client = provider.GetRequiredService<DiscordClient>();
-            var menu = new MenuExtension(configuration, client.ServiceProvider);
+            var generator = provider.GetRequiredService<MenuIdGenerator>();
+            var menu = new MenuExtension(configuration, client.ServiceProvider, generator);
 
             menuCallback(menu);
             return menu;

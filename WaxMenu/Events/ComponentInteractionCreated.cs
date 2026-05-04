@@ -5,9 +5,8 @@ namespace WaxMenu.Events;
 
 public class ComponentInteractionCreated(MenuExtension menu): IEventHandler<ComponentInteractionCreatedEventArgs>
 {
-    public Task HandleEventAsync(DiscordClient sender, ComponentInteractionCreatedEventArgs eventArgs)
+    public async Task HandleEventAsync(DiscordClient sender, ComponentInteractionCreatedEventArgs eventArgs)
     {
-        menu.HandleInteraction(sender, eventArgs);
-        return Task.CompletedTask;
+        await menu.HandleInteractionAsync(sender, eventArgs);
     }
 }

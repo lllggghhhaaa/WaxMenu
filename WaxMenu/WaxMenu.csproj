@@ -5,6 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
+        <Version>1.1.0</Version>
+        <Authors>lllggghhhaaa</Authors>
+        <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>

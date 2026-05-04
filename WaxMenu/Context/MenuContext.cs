@@ -4,7 +4,7 @@ using DSharpPlus.EventArgs;
 
 namespace WaxMenu.Context;
 
-public class MenuContext(DiscordClient client, ComponentInteractionCreatedEventArgs args)
+public class MenuContext(DiscordClient client, ComponentInteractionCreatedEventArgs args, MenuIdGenerator generator, string menuName)
 {
     public DiscordClient Client = client;
     public DiscordInteraction Interaction = args.Interaction;
@@ -16,6 +16,13 @@ public class MenuContext(DiscordClient client, ComponentInteractionCreatedEventA
     public DiscordMessage Message = args.Message;
     public string Locale = args.Locale;
     public string GuildLocale = args.GuildLocale;
+    public string MenuName = menuName;
+
+    public string GenerateId(string actionName, params object[] args) =>
+        generator.GenerateId(MenuName, actionName, args);
+
+    public string GenerateId(string menuName, string actionName, params object[] args) =>
+        generator.GenerateId(menuName, actionName, args);
 
     public async Task EditResponse(DiscordMessageBuilder messageBuilder) =>
         await Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage, new DiscordInteractionResponseBuilder(messageBuilder));

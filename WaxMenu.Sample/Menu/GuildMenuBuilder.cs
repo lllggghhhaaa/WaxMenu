@@ -4,10 +4,7 @@ namespace WaxMenu.Sample.Menu;
 
 public static class GuildMenuBuilder
 {
-    private const string Prefix = "menu";
-    private const string MenuName = "guild";
-    
-    public static DiscordMessageBuilder MainMenu(DiscordGuild guild)
+    public static DiscordMessageBuilder MainMenu(DiscordGuild guild, MenuIdGenerator generator)
     {
         var embed = new DiscordEmbedBuilder()
             .WithTitle($"Menu - {guild.Name}")
@@ -21,13 +18,13 @@ public static class GuildMenuBuilder
             .AddActionRowComponent(
                 new DiscordButtonComponent(
                     DiscordButtonStyle.Secondary,
-                    $"{Prefix}_{MenuName}_members",
+                    generator.GenerateId("guild", "members"),
                     "Members"));
 
         return messageBuilder;
     }
 
-    public static DiscordMessageBuilder MembersMenu()
+    public static DiscordMessageBuilder MembersMenu(MenuIdGenerator generator)
     {
         var embed = new DiscordEmbedBuilder()
             .WithTitle("Members")
@@ -39,10 +36,9 @@ public static class GuildMenuBuilder
             .AddActionRowComponent(
                 new DiscordButtonComponent(
                     DiscordButtonStyle.Secondary,
-                    $"{Prefix}_{MenuName}_home",
+                    generator.GenerateId("guild", "home"),
                     "Back to Home"));
 
         return messageBuilder;
     }
 }
-
