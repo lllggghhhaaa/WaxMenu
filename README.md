@@ -30,51 +30,75 @@ builder.Services
 You need to add a menu attribute to the class that you want to make the menu. You can use with Command extensions too
 <br/>Inside the class, you can add Menu Actions. This actions are triggered in every component interaction where match the requisites (See [ID Pattern](#id-pattern))
 
+
+#### Command
 ````csharp
-// Example
-[Command("guild"), Menu("guild")]
-public class GuildCommand(CiaraContext database)
+[Command("menu"), Menu("guild")]
+public class MenuCommands
 {
-    [Command("menu"), RequireGuild]
+    [Command("open"), RequireGuild]
     public async ValueTask Menu(CommandContext context)
     {
-        var idHash = Hash.HashId(context.Guild!.Id);
-        var dbGuild = await database.Guilds.FindOrCreateAsync(idHash, () => new BotGuild { IdHash = idHash }, database);
-        
-        await context.RespondAsync(GuildMenuBuilder.MainMenu(context.Guild.Name, dbGuild));
+        await context.RespondAsync(GuildMenuBuilder.MainMenu(context.Guild));
     }
 
     [MenuAction("home")]
     public async ValueTask Menu(MenuContext context)
     {
-        var idHash = Hash.HashId(context.Guild.Id);
-        var dbGuild = await database.Guilds.FindOrCreateAsync(idHash, () => new BotGuild { IdHash = idHash }, database);
-        
-        await context.EditResponse(GuildMenuBuilder.MainMenu(context.Guild.Name, dbGuild));
+        await context.EditResponse(GuildMenuBuilder.MainMenu(context.Guild));
     }
 
-    [MenuAction("newmember")]
-    public async ValueTask NewMember(MenuContext context)
+    [MenuAction("members")]
+    public async ValueTask Members(MenuContext context)
     {
-        var idHash = Hash.HashId(context.Guild.Id);
-        var dbGuild = await database.Guilds.FindOrCreateAsync(idHash, () => new BotGuild { IdHash = idHash }, database);
+        await context.EditResponse(GuildMenuBuilder.MembersMenu());
+    }
+}
+````
 
-        await context.EditResponse(GuildMenuBuilder.NewMemberMenu(context.Guild.Channels.Values,
-            context.Guild.Name, context.Channel.Id, dbGuild));
+#### Builder
+````csharp
+public static class GuildMenuBuilder
+{
+    private const string Prefix = "menu";
+    private const string MenuName = "guild";
+    
+    public static DiscordMessageBuilder MainMenu(DiscordGuild guild)
+    {
+        var embed = new DiscordEmbedBuilder()
+            .WithTitle($"Menu - {guild.Name}")
+            .WithDescription("Guild information...")
+            .WithColor(DiscordColor.Blue)
+            .AddField("Server", guild.Name, false)
+            .AddField("Members", guild.MemberCount.ToString(), false);
+
+        var messageBuilder = new DiscordMessageBuilder()
+            .AddEmbed(embed)
+            .AddActionRowComponent(
+                new DiscordButtonComponent(
+                    DiscordButtonStyle.Secondary,
+                    $"{Prefix}_{MenuName}_members",
+                    "Members"));
+
+        return messageBuilder;
     }
 
-    [MenuAction("newmemberselect")]
-    public async ValueTask NewMemberSelect(MenuContext context)
+    public static DiscordMessageBuilder MembersMenu()
     {
-        var idHash = Hash.HashId(context.Guild.Id);
-        var dbGuild = await database.Guilds.FindOrCreateAsync(idHash, () => new BotGuild { IdHash = idHash }, database);
+        var embed = new DiscordEmbedBuilder()
+            .WithTitle("Members")
+            .WithDescription("Member list...")
+            .WithColor(DiscordColor.Green);
 
-        dbGuild.MemberJoinViewChannelId = ulong.Parse(context.SelectValues[0]);
-        database.Guilds.Update(dbGuild);
-        await database.SaveChangesAsync();
+        var messageBuilder = new DiscordMessageBuilder()
+            .AddEmbed(embed)
+            .AddActionRowComponent(
+                new DiscordButtonComponent(
+                    DiscordButtonStyle.Secondary,
+                    $"{Prefix}_{MenuName}_home",
+                    "Back to Home"));
 
-        await context.EditResponse(GuildMenuBuilder.NewMemberMenu(context.Guild.Channels.Values,
-            context.Guild.Name, context.Channel.Id, dbGuild));
+        return messageBuilder;
     }
 }
 ````
